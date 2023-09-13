@@ -1,6 +1,7 @@
 #include "game.h"
 #include <iostream>
 #include "SDL.h"
+#include <string>
 
 Game::Game(std::size_t grid_width, std::size_t grid_height)
     : snake(grid_width, grid_height),
@@ -11,7 +12,8 @@ Game::Game(std::size_t grid_width, std::size_t grid_height)
 }
 
 void Game::Run(Controller const &controller, Renderer &renderer,
-               std::size_t target_frame_duration) {
+               std::size_t target_frame_duration) 
+{
   Uint32 title_timestamp = SDL_GetTicks();
   Uint32 frame_start;
   Uint32 frame_end;
@@ -19,7 +21,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   int frame_count = 0;
   bool running = true;
 
-  while (running) {
+  while (snake.alive && running) {
     frame_start = SDL_GetTicks();
 
     // Input, Update, Render - the main game loop.
@@ -36,7 +38,7 @@ void Game::Run(Controller const &controller, Renderer &renderer,
 
     // After every second, update the window title.
     if (frame_end - title_timestamp >= 1000) {
-      renderer.UpdateWindowTitle(score, frame_count);
+      renderer.UpdateWindowTitle(score, high_score, frame_count);
       frame_count = 0;
       title_timestamp = frame_end;
     }
@@ -48,9 +50,34 @@ void Game::Run(Controller const &controller, Renderer &renderer,
       SDL_Delay(target_frame_duration - frame_duration);
     }
   }
+  std::cout << "score: " << score << " high: " << high_score << "\n";
+  if (score > high_score)
+  {
+    SetHighScore(score);
+  }
+
+  while (running) 
+  {
+    frame_start = SDL_GetTicks();
+    controller.HandleInput(running, snake);
+
+    frame_end = SDL_GetTicks();
+    frame_count++;
+    frame_duration = frame_end - frame_start;
+
+    if (frame_end - title_timestamp >= 1000) {
+      renderer.UpdateWindowTitle(score, high_score, frame_count);
+      frame_count = 0;
+      title_timestamp = frame_end;
+    }
+    if (frame_duration < target_frame_duration) {
+      SDL_Delay(target_frame_duration - frame_duration);
+    }
+  }
 }
 
-void Game::PlaceFood() {
+void Game::PlaceFood() 
+{
   int x, y;
   while (true) {
     x = random_w(engine);
@@ -81,6 +108,39 @@ void Game::Update() {
     snake.GrowBody();
     snake.speed += 0.02;
   }
+}
+
+void Game::GetHighScore()
+{
+  std::cout << "searching: " << kHighScorePath << " for hs\n";
+  std::string line;
+  int score;
+  std::ifstream stream(kHighScorePath);
+  if (!stream.is_open()) {
+      std::cerr << "Error: Unable to open file " << kHighScorePath << std::endl;
+      return; // or handle the error in another way
+  }
+
+  std::cout << "getting high score\n";
+  std::getline(stream, line);
+  std::istringstream linestream(line);
+  linestream >> score;
+
+  this->high_score = score;
+}
+
+void Game::SetHighScore(int high)
+{
+  this->high_score = high;
+  std::ofstream outputFile(kHighScorePath);
+  if (!outputFile.is_open()) {
+      std::cerr << "Error: Unable to open file " << kHighScorePath << std::endl;
+      return; // or handle the error in another way
+  }
+    std::cout << "setting high score\n";
+    outputFile << high_score;
+
+    outputFile.close();
 }
 
 int Game::GetScore() const { return score; }
