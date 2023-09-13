@@ -24,7 +24,6 @@ class Game {
   const std::string kHighScorePath = {"../highscore.txt"};
   Snake snake;
   SDL_Point food;
-  int high_score{0};
 
   std::random_device dev;
   std::mt19937 engine;
@@ -32,6 +31,7 @@ class Game {
   std::uniform_int_distribution<int> random_h;
 
   int score{0};
+  int high_score{0};
 
   void PlaceFood();
   void Update();
