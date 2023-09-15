@@ -19,7 +19,6 @@ class HighScore
         
         HighScoreData GetHighScore();
         void SetHighScore(int high, std::string name);
-        std::string GetName();
 
         void WriteHighScoreToFile(int high, std::string name);
         void ReadHighScoreFromFile();
@@ -33,5 +32,3 @@ class HighScore
 };
 
 #endif
-
-
