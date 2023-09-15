@@ -39,3 +39,37 @@ void Controller::HandleInput(bool &running, Snake &snake) const {
     }
   }
 }
+
+void Controller::HandleTyping(bool &running, std::string &inputString) const
+{
+  SDL_Event e;
+  while (SDL_PollEvent(&e)) {
+    switch (e.type)
+    {
+      case SDL_QUIT:
+        std::cout << "running is false\n";
+        running = false;
+        break;
+      
+      case SDL_TEXTINPUT:
+        if (e.text.text[0] != ' ')
+        {
+          inputString += e.text.text;
+          break;
+        }
+        
+      case SDL_KEYDOWN:
+        if (e.key.keysym.sym == SDLK_BACKSPACE && !inputString.empty())
+        {
+          inputString.pop_back();
+          break;
+        }
+
+        if (e.key.keysym.sym == SDLK_RETURN)
+        {
+          running = false;
+          break;
+        }
+    }
+  }
+}

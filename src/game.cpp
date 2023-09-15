@@ -55,19 +55,27 @@ void Game::Run(Controller const &controller, Renderer &renderer,
   std::cout << "score: " << score << " high: " << high_score.GetHighScore().high_score << "\n";
   if (score > high_score.GetHighScore().high_score)
   {
-    // high_score.SetHighScore(score);
-    std::string name;
-    std::cout << "Enter your name: \n";
-    std::cin >> name;
-    high_score.WriteHighScoreToFile(score, name);
+    std::string name = "";
+
+    while (running)
+    {
+      // Get name for high score
+      controller.HandleTyping(running, name);
+      renderer.RenderText("Enter your name: ", name);
+    }
+
+    high_score.WriteHighScoreToFile(score, name); 
+    running = true;
   }
 
   // End Screen which displays the High Scores
+  std::string data = high_score.GetHighScore().name + ": " + std::to_string(high_score.GetHighScore().high_score);
   while (running) 
   {
+
     frame_start = SDL_GetTicks();
     controller.HandleInput(running, snake);
-
+    renderer.RenderText("High Score: ", data);
     frame_end = SDL_GetTicks();
     frame_count++;
     frame_duration = frame_end - frame_start;
