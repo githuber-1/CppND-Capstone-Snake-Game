@@ -16,7 +16,7 @@ class HighScore
 {
     public:
         HighScore() { this->high_score.high_score = 0; this->high_score.name = ""; }
-        
+
         HighScoreData GetHighScore();
         void SetHighScore(int high, std::string name);
 
@@ -24,8 +24,6 @@ class HighScore
         void ReadHighScoreFromFile();
 
     private:
-
-        std::string name;
         const std::string kHighScorePath = {"../highscore.txt"};
         HighScoreData high_score; 
     
